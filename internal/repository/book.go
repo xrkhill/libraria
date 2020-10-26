@@ -14,9 +14,9 @@ type BookRepository struct {
 }
 
 // NewBookRepository rerurns a reference to a BookRepository
-func NewBookRepository() *BookRepository {
+func NewBookRepository(defaultBooks data.Books) *BookRepository {
 	return &BookRepository{
-		books: make(data.Books),
+		books: defaultBooks,
 	}
 }
 

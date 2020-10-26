@@ -3,20 +3,27 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/xrkhill/libraria/internal/data"
 	"github.com/xrkhill/libraria/internal/repository"
 	"github.com/xrkhill/libraria/internal/service"
 )
 
-func main() {
-	repo := repository.NewBookRepository()
+func setupRouter(defaultBooks data.Books) *gin.Engine {
+	repo := repository.NewBookRepository(defaultBooks)
 	svc := service.NewBookService(repo)
-	route := gin.Default()
+	router := gin.Default()
 
-	route.GET("/books", svc.AllBooks)
-	route.GET("/books/:isbn", svc.GetBook)
-	route.POST("/books", svc.CreateBook)
-	route.PUT("/books", svc.UpdateBook)
-	route.DELETE("/books/:isbn", svc.DeleteBook)
+	router.POST("/books", svc.CreateBook)
+	router.GET("/books", svc.AllBooks)
+	router.GET("/books/:isbn", svc.GetBook)
+	router.PUT("/books", svc.UpdateBook)
+	router.DELETE("/books/:isbn", svc.DeleteBook)
 
-	route.Run(":8080")
+	return router
+}
+
+func main() {
+	router := setupRouter(data.Books{})
+
+	router.Run(":8080")
 }

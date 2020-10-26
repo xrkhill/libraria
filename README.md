@@ -4,7 +4,10 @@ Libraria is a sample REST API for books.
 
 ## Running
 
+Tested with Go 1.13.x. Uses Go Modules.
+
 ```bash
+go test ./...
 go run main.go
 ```
 
