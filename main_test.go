@@ -13,7 +13,7 @@ import (
 	"github.com/xrkhill/libraria/internal/data"
 )
 
-func TestCreateBook(t *testing.T) {
+func TestCreateBooks(t *testing.T) {
 	testCases := []struct {
 		requestMethod string
 		requestURI    string
@@ -53,7 +53,7 @@ func TestCreateBook(t *testing.T) {
 	}
 }
 
-func TestModifyBooks(t *testing.T) {
+func TestExistingBooks(t *testing.T) {
 	testCases := []struct {
 		requestMethod string
 		requestURI    string
