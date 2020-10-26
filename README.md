@@ -23,6 +23,7 @@ Create a book.
 
 ```bash
 curl -s -X POST http://localhost:8080/books -H "Content-Type: application/json" -d "@book_00.json"
+curl -s -X POST http://localhost:8080/books -H "Content-Type: application/json" -d "@book_01.json"
 ```
 
 #### Response

@@ -9,15 +9,15 @@ import (
 )
 
 func setupRouter(defaultBooks data.Books) *gin.Engine {
-	repo := repository.NewBookRepository(defaultBooks)
+	repo := repository.NewMemoryBookRepository(defaultBooks)
 	svc := service.NewBookService(repo)
 	router := gin.Default()
 
-	router.POST("/books", svc.CreateBook)
-	router.GET("/books", svc.AllBooks)
-	router.GET("/books/:isbn", svc.GetBook)
-	router.PUT("/books", svc.UpdateBook)
-	router.DELETE("/books/:isbn", svc.DeleteBook)
+	router.POST("/books", svc.Create)
+	router.GET("/books", svc.ReadAll)
+	router.GET("/books/:isbn", svc.ReadOne)
+	router.PUT("/books", svc.Update)
+	router.DELETE("/books/:isbn", svc.Delete)
 
 	return router
 }
