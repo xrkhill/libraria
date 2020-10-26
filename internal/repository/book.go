@@ -26,23 +26,12 @@ func (b *BookRepository) Create(book data.Book) (data.Book, error) {
 	defer b.mu.Unlock()
 
 	if _, ok := b.books[book.ISBN]; ok {
-		return data.Book{}, fmt.Errorf("book %s already exists", book.ISBN)
+		return data.Book{}, fmt.Errorf("book %s already exists, unable to create", book.ISBN)
 	}
 
 	b.books[book.ISBN] = book
 
 	return book, nil
-}
-
-func (b *BookRepository) Read(isbn string) (data.Book, error) {
-	b.mu.RLock()
-	defer b.mu.RUnlock()
-
-	if existingBook, ok := b.books[isbn]; ok {
-		return existingBook, nil
-	}
-
-	return data.Book{}, fmt.Errorf("book %s does not exist", isbn)
 }
 
 // ReadAll returns a list of books
@@ -53,17 +42,28 @@ func (b *BookRepository) ReadAll() data.Books {
 	return b.books
 }
 
+func (b *BookRepository) Read(isbn string) (data.Book, error) {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+
+	if existingBook, ok := b.books[isbn]; ok {
+		return existingBook, nil
+	}
+
+	return data.Book{}, fmt.Errorf("book %s does not exist, unable to read", isbn)
+}
+
 // Update updates an existing book
 func (b *BookRepository) Update(book data.Book) (data.Book, error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	if updatedBook, ok := b.books[book.ISBN]; ok {
-		return updatedBook, nil
+	if _, ok := b.books[book.ISBN]; ok {
+		b.books[book.ISBN] = book
+		return book, nil
 	}
 
-	return data.Book{}, fmt.Errorf("book %s does not exist", book.ISBN)
-
+	return data.Book{}, fmt.Errorf("book %s does not exist, unable to update", book.ISBN)
 }
 
 // Delete removes an existing book
@@ -76,6 +76,5 @@ func (b *BookRepository) Delete(isbn string) error {
 		return nil
 	}
 
-	return fmt.Errorf("book %s does not exist", isbn)
-
+	return fmt.Errorf("book %s does not exist, unable to delete", isbn)
 }

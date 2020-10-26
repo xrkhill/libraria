@@ -6,11 +6,11 @@ import (
 
 // Book is a struct for library book data
 type Book struct {
-	Author    string    `json:"author"`
-	Title     string    `json:"title"`
-	ISBN      string    `json:"ISBN"`
+	Author    string    `json:"author" binding:"required"`
+	Title     string    `json:"title" binding:"required"`
+	ISBN      string    `json:"ISBN" binding:"required"`
 	Language  string    `json:"language"`
-	Published time.Time `json:"published"`
+	Published time.Time `json:"published" binding:"required"`
 	ListPrice int       `json:"listPrice"`
 }
 

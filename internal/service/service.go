@@ -9,30 +9,30 @@ import (
 	"github.com/xrkhill/libraria/internal/repository"
 )
 
-// Service is an HTTP service
-type Service struct {
+// BookService is an HTTP service
+type BookService struct {
 	repo *repository.BookRepository
 }
 
-// NewService returns a Service struct
-func NewService(r *repository.BookRepository) *Service {
-	return &Service{
+// NewBookService returns a BookService struct
+func NewBookService(r *repository.BookRepository) *BookService {
+	return &BookService{
 		repo: r,
 	}
 }
 
 // AllBooks fetches all books from the collection
-func (s *Service) AllBooks(c *gin.Context) {
+func (s *BookService) AllBooks(c *gin.Context) {
 	c.JSON(http.StatusOK, s.repo.ReadAll())
 }
 
 // GetBook fetches one book by ISBN
-func (s *Service) GetBook(c *gin.Context) {
+func (s *BookService) GetBook(c *gin.Context) {
 	isbn := c.Params.ByName("isbn")
 
 	book, err := s.repo.Read(isbn)
 	if err != nil {
-		c.JSON(http.StatusNotFound, nil)
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -40,16 +40,16 @@ func (s *Service) GetBook(c *gin.Context) {
 }
 
 // CreateBook creates one book
-func (s *Service) CreateBook(c *gin.Context) {
+func (s *BookService) CreateBook(c *gin.Context) {
 	var newBook data.Book
-	if c.Bind(&newBook) != nil {
-		c.JSON(http.StatusBadRequest, nil)
+	if err := c.ShouldBindJSON(&newBook); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	book, err := s.repo.Create(newBook)
 	if err != nil {
-		c.JSON(http.StatusNotModified, nil)
+		c.JSON(http.StatusNotModified, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -57,17 +57,30 @@ func (s *Service) CreateBook(c *gin.Context) {
 }
 
 // UpdateBook creates one book
-func (s *Service) UpdateBook(c *gin.Context) {
-}
-
-// DeleteBook creates one book
-func (s *Service) DeleteBook(c *gin.Context) {
-	isbn := c.Params.ByName("isbn")
-
-	if err := s.repo.Delete(isbn); err != nil {
-		c.JSON(http.StatusNotFound, nil)
+func (s *BookService) UpdateBook(c *gin.Context) {
+	var existingBook data.Book
+	if err := c.ShouldBindJSON(&existingBook); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	book, err := s.repo.Update(existingBook)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, book)
+}
+
+// DeleteBook creates one book
+func (s *BookService) DeleteBook(c *gin.Context) {
+	isbn := c.Params.ByName("isbn")
+
+	if err := s.repo.Delete(isbn); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
